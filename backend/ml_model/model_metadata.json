@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "trained_at": "2026-03-20T06:28:34.434482+00:00",
+  "features": [
+    "amount",
+    "hour",
+    "day_of_week",
+    "merchant_category",
+    "channel",
+    "card_type",
+    "transaction_type",
+    "frequency_24h",
+    "avg_amount_7d",
+    "distance_from_home",
+    "failed_attempts",
+    "new_device",
+    "vpn_detected",
+    "night_transaction",
+    "weekend",
+    "amount_ratio"
+  ],
+  "n_estimators": 100,
+  "fraud_threshold": 0.5,
+  "roc_auc": 1.0
+}
