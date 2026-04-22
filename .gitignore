@@ -52,7 +52,6 @@ Thumbs.db
 
 # Environment variables
 .env
-
 # Flutter exceptions
 !lib/
 !lib/**/*.dart
