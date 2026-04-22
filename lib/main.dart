@@ -652,12 +652,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Logout', style: TextStyle(color: Colors.red)),
             onTap: () async {
+              final navigator = Navigator.of(context);
               const storage = FlutterSecureStorage();
               await storage.delete(key: 'auth_token');
               await storage.delete(key: 'current_user');
               
               if (mounted) {
-                Navigator.pushReplacementNamed(context, '/login');
+                navigator.pushReplacementNamed('/login');
               }
             },
           ),
