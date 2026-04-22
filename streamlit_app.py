@@ -319,7 +319,7 @@ def dashboard_page():
             fig = px.line(trend_df, x='date', y='fraud_count', 
                          title='Daily Fraud Cases', 
                          labels={'fraud_count': 'Number of Fraud Cases'})
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
         else:
             st.info("No fraud data available for the last 7 days")
     
@@ -351,7 +351,7 @@ def dashboard_page():
             return [''] * len(row)
         
         styled_df = df_display.style.apply(highlight_fraud, axis=1)
-        st.dataframe(styled_df, use_container_width=True)
+        st.dataframe(styled_df, width='stretch')
     else:
         st.info("No transactions found")
 
@@ -446,7 +446,7 @@ def transactions_page():
         elif fraud_filter == "Not Fraud":
             df = df[df['is_fraud'] == 0]
         
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df, width='stretch')
         
         # Export option
         csv = df.to_csv(index=False)
