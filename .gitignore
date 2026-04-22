@@ -10,7 +10,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -53,3 +52,22 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# Flutter exceptions
+!lib/
+!lib/**/*.dart
+!lib/**/*.yaml
+!lib/**/*.json
+!mobile_app/
+!mobile_app/**/
+!flutter_main.dart
+!pubspec.yaml
+!pubspec.lock
+!.flutter-plugins
+!.metadata
+!.packages
+!android/
+!build/
+!ios/
+!web/
+!windows/
