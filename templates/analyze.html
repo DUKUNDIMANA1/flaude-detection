@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analyze Transaction - FraudGuard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; }
+        .sidebar { width: 250px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: fit-content; }
+        .main-content { flex: 1; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #1f77b4; margin-bottom: 30px; }
+        h2 { color: #333; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; }
+        input[type="number"] { width: 100px; }
+        .btn { background: #dc3545; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn:hover { background: #c82333; }
+        .btn-secondary { background: #6c757d; }
+        .btn-secondary:hover { background: #5a6268; }
+        .result { margin-top: 30px; padding: 20px; border-radius: 5px; display: none; }
+        .result-success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .result-error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .result-warning { background: #fff3cd; border: 1px solid #ffeaa7; }
+        .nav-link { display: block; padding: 10px; color: #1f77b4; text-decoration: none; border-radius: 5px; margin-bottom: 5px; }
+        .nav-link:hover { background: #e8f5e8; }
+        .nav-link.active { background: #1f77b4; color: white; }
+        .user-info { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+        .logout-btn { background: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Navigation</h2>
+            <select id="pageSelector" onchange="navigateToPage()" style="width: 100%; padding: 10px; margin-bottom: 20px;">
+                <option value="/analyze" selected>Analyze Transaction</option>
+                <option value="/">Dashboard</option>
+            </select>
+            
+            <div class="user-info">
+                <strong>Logged in as:</strong><br>
+                admin@test.com
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h1>Analyze Transaction</h1>
+            
+            <form id="analyzeForm">
+                <div class="form-group">
+                    <label for="merchant">Merchant:</label>
+                    <input type="text" id="merchant" name="merchant" value="Test Store" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="transactions_24h">Transactions (24h):</label>
+                    <input type="number" id="transactions_24h" name="transactions_24h" value="1" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Merchant Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="electronics" selected>Electronics</option>
+                        <option value="retail">Retail</option>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="gas">Gas Station</option>
+                        <option value="online">Online</option>
+                        <option value="atm">ATM</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="failed_attempts">Failed Attempts:</label>
+                    <input type="number" id="failed_attempts" name="failed_attempts" value="0" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="channel">Channel:</label>
+                    <select id="channel" name="channel" required>
+                        <option value="online" selected>Online</option>
+                        <option value="in_store">In Store</option>
+                        <option value="mobile">Mobile</option>
+                        <option value="phone">Phone</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="avg_amount">Avg Amount (7 days):</label>
+                    <input type="number" id="avg_amount" name="avg_amount" value="50.00" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="card_type">Card Type:</label>
+                    <select id="card_type" name="card_type" required>
+                        <option value="credit" selected>Credit</option>
+                        <option value="debit">Debit</option>
+                        <option value="prepaid">Prepaid</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Transaction Amount ($):</label>
+                    <input type="number" id="amount" name="amount" placeholder="Enter amount" step="0.01" min="0" required>
+                </div>
+
+                <button type="submit" class="btn">Analyze Transaction</button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+            </form>
+
+            <div id="analysisResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('analyzeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                displayResult(result);
+                
+            } catch (error) {
+                displayError('Network error: ' + error.message);
+            }
+        });
+
+        function displayResult(result) {
+            const resultDiv = document.getElementById('analysisResult');
+            
+            if (result.status === 'success') {
+                const riskClass = result.is_fraud ? 'result-error' : 'result-success';
+                const riskLevel = result.is_fraud ? 'High' : 'Low';
+                
+                resultDiv.className = `result ${riskClass}`;
+                resultDiv.innerHTML = `
+                    <h3>Analysis Results</h3>
+                    <p><strong>Risk Score:</strong> ${(result.risk_score * 100).toFixed(1)}%</p>
+                    <p><strong>Fraud Probability:</strong> ${riskLevel}</p>
+                    <p><strong>Confidence:</strong> ${(result.confidence * 100).toFixed(1)}%</p>
+                    ${result.risk_factors.length > 0 ? `<p><strong>Risk Factors:</strong><br>${result.risk_factors.join('<br>')}</p>` : ''}
+                    <div style="margin-top: 15px; padding: 10px; background: ${result.is_fraud ? '#f8d7da' : '#d4edda'}; border-radius: 5px;">
+                        <strong>Recommendation:</strong> ${result.recommendation}
+                    </div>
+                `;
+            } else {
+                displayError(result.message || 'Analysis failed');
+            }
+            
+            resultDiv.style.display = 'block';
+        }
+
+        function displayError(message) {
+            const resultDiv = document.getElementById('analysisResult');
+            resultDiv.className = 'result result-error';
+            resultDiv.innerHTML = `<h3>Error</h3><p>${message}</p>`;
+            resultDiv.style.display = 'block';
+        }
+
+        function resetForm() {
+            document.getElementById('analyzeForm').reset();
+            document.getElementById('analysisResult').style.display = 'none';
+        }
+
+        function navigateToPage() {
+            const selector = document.getElementById('pageSelector');
+            window.location.href = selector.value;
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "fraud-detection-app",
+  "version": "1.0.0",
+  "description": "Fraud Detection Dashboard - Streamlit App",
+  "scripts": {
+    "dev": "streamlit run streamlit_app.py",
+    "build": "echo 'Build completed'",
+    "start": "streamlit run streamlit_app.py --server.port=$PORT --server.headless=true"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
